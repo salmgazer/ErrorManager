@@ -1,0 +1,33 @@
+.voda_background{
+	background-color: #e60000;
+}
+
+.header_text{
+	color: white;
+}
+
+#small_logo{
+	width: 35px;
+	height: auto;
+	margin-top: -5px;
+}
+
+.text-white{
+	color: white;
+}
+
+.voda-text{
+	color: #e60000;
+}
+
+.search-input{
+	height: 43px;
+}
+
+#search-form{
+	margin-top: 10px;
+}
+
+.button-gap{
+	margin-left: 15px;
+}

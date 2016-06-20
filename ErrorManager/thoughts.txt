@@ -1,0 +1,1 @@
+Catch exceptions around queries
