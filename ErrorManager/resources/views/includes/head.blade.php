@@ -9,8 +9,10 @@
     <!-- Bootstrap Core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
 
+    @if($datatables == 'true')
     <!-- DataTables CSS -->
     <link href="css/plugins/dataTables.bootstrap.css" rel="stylesheet">
+    @endif
 
     <!-- Custom CSS -->
     <link href="/css/sb-admin-2.css" rel="stylesheet">

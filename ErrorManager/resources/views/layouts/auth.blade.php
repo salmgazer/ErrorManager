@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="images/vodafone-logo.png">
 
-    <title>Vodafone Solver</title>
+    <title>Vodafone Zeus</title>
 
     <!-- Fonts -->
     <link rel="stylesheet" href="/font-awesome-4.1.0/css/font-awesome.min.css">
@@ -46,7 +46,7 @@
                     <img src="/images/vodafone-logo.png" class="voda_logo">
                 </a>
                 <a class="navbar-brand" style="color: white;">
-                    Vodafone Solver
+                    Vodafone <b class="zeus">Zeus</b>
                 </a>
             </div>
 

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use Auth;
 use App\User;
+use Hash;
+
 class UserController extends Controller
 {
     //
@@ -36,7 +38,8 @@ class UserController extends Controller
     	$this->authuser();
     	if(Auth::user()->type == 'superadmin'){
     		return view('pages.admin.adduser')
-    			->with('page_title', 'Add New User | Vodafone');
+    			->with('page_title', 'Add New User | Vodafone')
+          ->with('datatables', 'false');
     	}else{
     		//note the person and report to admin
     		$this->unautherized();
@@ -157,7 +160,8 @@ class UserController extends Controller
     		}
     		return view('pages.admin.home')
     			->with('users', $users)
-    			->with('page_title', 'Manage Users | Vodafone');
+    			->with('page_title', 'Manage Users | Vodafone')
+                ->with('datatables', 'true');
     	}else{
     		//note the person and report to admin
     		$this->unautherized();
@@ -176,7 +180,7 @@ class UserController extends Controller
     				return redirect()->back()->with('success', $user->name.' is now active');
     			}else{
     				return redirect()->back()->with('failure', $user->name.' is still inactive. Encountered errors!');
-    			}	
+    			}
     		}elseif($user->status == 'active'){
     			return redirect()->back()->with('failure', $user->name.' is already active');
     		}
@@ -219,7 +223,7 @@ class UserController extends Controller
     	}
     }
 
-    
+
     public function statistics(){
         $this->authuser();
         if(Auth::user()->type == 'admin'){
@@ -227,6 +231,46 @@ class UserController extends Controller
         }
         else{
             return $this->unautherized();
+        }
+    }
+
+    public function getUserDetails(){
+        echo '{"name": "'.Auth::user()->name.'", "email": "'.Auth::user()->email.'"}';
+        return;
+    }
+
+    public function profile(){
+        if(Auth::check()){
+            return view('pages.admin.profile')
+                ->with('page_title', 'Profile | Vodafone')
+                ->with('datatables', false);
+        }
+        else{
+            return redirect('/')
+                ->with('failure', 'You need to login!');
+        }
+    }
+
+    public function updatepass(Request $request){
+        if(Auth::check()){
+            $this->validate($request, [
+                'password' => 'required|min:8|confirmed',
+                'password_current' => 'required|min:8'
+                ]);
+            $user =  User::findOrFail(Auth::user()->id);
+            if(!Hash::check($request->password_current, $user->password)){
+              return redirect()
+                ->back()
+                ->with('failure', 'The current password you entered is wrong!');
+            }
+            $user->password = bcrypt($request->password);
+            $user->save();
+
+            return redirect('/logout')
+                ->with('success', 'Your password has been updated!');
+        }else{
+            return redirect('/')
+                ->with('failure', 'You need to login!');
         }
     }
 

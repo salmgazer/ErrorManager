@@ -6,16 +6,24 @@
         @include('common.success')
         @include('common.failure')
             <div class="panel panel-default">
-                <div class="panel-heading"><strong class="text-primary">Resolve Bulk <b class="voda-text">Resubmit</b> Errors</strong></div>
+                <div class="panel-heading"><strong class="text-primary">Resolve Bulk <b class="voda-text">In Progress</b> Errors</strong></div>
                 <div class="panel-body">   
-                    <div class="form-border col-md-12 col-md-offset-1" id="search-form">
+                    <div class="form-border col-md-12" id="search-form">
                     <form class="form-group" method="POST" action="/errors/bulkupload/" enctype="multipart/form-data">
                         {!! csrf_field() !!}
                         <div class="col-md-3">
-                            <input type="file" name="errors_file" class="form-control search-input" class="required" required="required"><!--<i class="fa fa-file-excel-o"></i>-->
+                            <input type="file" name="errors_file" class="form-control search-input" class="required" required="required">
                         </div>
                         <div>
-                            <input type="text" name="operation" value="Resubmit" hidden>
+                            <input type="text" value="In progress" name="operation" hidden>
+                            <input type="text" value="yes" name="by_id" hidden="">
+                        </div>
+                        <div  class="col-md-2">
+                            <select class="form-control" name="action" id="action">
+                                <option>RETRY</option>
+                                <option>FC</option>
+                                <option>FAILED</option>
+                            </select>
                         </div>
                         <div class="col-md-2">
                         <button type="submit" class="btn btn-primary search-input"><i class="fa fa-upload fa-1x"></i> &nbsp;&nbsp; Upload &nbsp;&nbsp;
@@ -29,13 +37,11 @@
                                     <thead>
                                         <tr>
                                             <th>oc_id</th>
-                                            <th>oc_name</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td>25452</td>
-                                            <td>Billing.CBS.ActivateSubscriber</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -55,6 +61,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Operation</th>
+                                <th>Action</th>
                                 <th>File</th>
                                 <th>Status</th>
                                 <th>Success Rate</th>
@@ -66,6 +73,7 @@
                                 <tr>
                                 <td>{{ $bf->id }}</td>
                                 <td>{{ $bf->operation }}</td>
+                                <td>{{ $bf->action }}</td>
                                 <td>
                                     <center>
                                         <a href="/files/error_files/new/{{ $bf->filename }}" target="_blank" class="text-danger"><i class="fa fa-file-excel-o fa-2x"></i></a>

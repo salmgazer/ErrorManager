@@ -1,1 +1,9 @@
 Catch exceptions around queries
+
+Every one minute, load new notifications
+
+connect bulk_file to errors
+
+
+//
+Add action type to errors when resolving

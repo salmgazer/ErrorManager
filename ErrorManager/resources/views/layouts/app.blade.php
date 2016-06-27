@@ -22,20 +22,21 @@
                     <img src="/images/vodafone-logo.png" id="small_logo">
                 </a>
                 <a class="navbar-brand" style="color: white;" href="/">
-                    Vodafone
+                    Vodafone <b class="zeus">Zeus</b>
                 </a>
+
+                <!--<button class="btn" onclick="getuser()">Click</button>-->
             </div>
             <!-- /.navbar-header -->
 
             <ul class="nav navbar-top-links navbar-right">
-
                 <li class="dropdown">
                     <a class="dropdown-toggle text-white" data-toggle="dropdown" href="#">
                         {{ Auth::user()->name }} &nbsp;&nbsp;<i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down">
                         </i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
-                        <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                        <li><a href="/profile"><i class="fa fa-user fa-fw"></i>Profile</a>
                         </li>
                         <li class="divider"></li>
                         <li><a href="{{ url('/logout') }}"><i class="fa fa-sign-out fa-fw voda-text"></i> Logout</a>
@@ -51,7 +52,7 @@
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
                         <li>
-                            <a class="active" href="/"><i class="fa fa-dashboard fa-fw voda-text"></i> Dashboard</a>
+                            <a class="active" href="/"><i class="fa fa-home fa-fw voda-text"></i> Home</a>
                         </li>
                         @if(Auth::user()->type == 'superadmin')
                             <li class="">
@@ -71,69 +72,54 @@
                             <a href="#"><i class="fa fa-bar-chart-o fa-fw voda-text"></i> Bulk Errors<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level collapse" style="height: 0px;">
                                 <li>
-                                    <a href="/"><i class="fa fa-times voda-text"></i>&nbsp;&nbsp;Resolve Bulk Errors</a>
+                                    <a href="/errors/retry"><i class="fa fa-tasks voda-text"></i>&nbsp;&nbsp;Resubmit</a>
                                 </li>
                                 <li>
-                                    <a href="/errors/statistics"><i class="fa fa-bar-chart-o fa-fw voda-text"></i>&nbsp;&nbsp;View Error Reports</a>
+                                    <a href="/errors/bulk_in_progress"><i class="fa fa-tasks voda-text"></i>&nbsp;&nbsp;In Progress : OC_Name</a>
                                 </li>
                                 <li>
-                                    <a href="#"><i class="fa fa-history voda-text"></i> &nbsp;&nbsp; History</a>
+                                    <a href="/errors/bulk_in_progress_id"><i class="fa fa-tasks voda-text"></i>&nbsp;&nbsp;In progress : OC_ID</a>
+                                </li>
+                                <li>
+                                    <a href="/errors/history"><i class="fa fa-history voda-text"></i> &nbsp;&nbsp; History</a>
+                                </li>
+                            </ul>
+                            <!-- /.nav-second-level -->
+                        </li>
+                        <li class="">
+                            <a href="#"><i class="fa fa-wrench fa-fw voda-text"></i> Single Errors<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level collapse" style="height: 0px;">
+                                <li>
+                                    <a href="/errors/single"><i class="fa fa-times voda-text"></i>&nbsp;&nbsp;Resolve Errors</a>
+                                </li>
+                                <li>
+                                    <a href="/errors/report"><i class="fa fa-history voda-text"></i>&nbsp;&nbsp;History</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
                         @elseif(Auth::user()->type == 'front_office')
                         <li class="">
-                            <a href="#"><i class="fa fa-wrench fa-fw"></i> Resole Errors<span class="fa arrow"></span></a>
+                            <a href="#"><i class="fa fa-wrench fa-fw voda-text"></i> Resolve Errors<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level collapse" style="height: 0px;">
                                 <li>
-                                    <a href="panels-wells.html">Resolve Error</a>
+                                    <a href="/errors/single"><i class="fa fa-gear fa-1x voda-text"></i>&nbsp;&nbsp;Resolve Single Errors</a>
                                 </li>
                                 <li>
-                                    <a href="buttons.html">Report Error</a>
-                                </li>
-                            </ul>
-                            <!-- /.nav-second-level -->
-                        </li>
-                        @else
-                        <li>
-                            <a href="#"><i class="fa fa-sitemap fa-fw"></i> Multi-Level Dropdown<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level collapse">
-                                <li>
-                                    <a href="#">Second Level Item</a>
-                                </li>
-                                <li>
-                                    <a href="#">Second Level Item</a>
-                                </li>
-                                <li>
-                                    <a href="#">Third Level <span class="fa arrow"></span></a>
-                                    <ul class="nav nav-third-level collapse">
-                                        <li>
-                                            <a href="#">Third Level Item</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Third Level Item</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Third Level Item</a>
-                                        </li>
-                                        <li>
-                                            <a href="#">Third Level Item</a>
-                                        </li>
-                                    </ul>
-                                    <!-- /.nav-third-level -->
+                                    <a href="/errors/report"><i class="fa fa-history fa-1x voda-text"></i>&nbsp;&nbsp;History</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
-                        <li>
-                            <a href="#"><i class="fa fa-files-o fa-fw"></i> Sample Pages<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level collapse">
+                        @elseif(Auth::user()->type == 'back_office')
+                        <li class="">
+                            <a href="#"><i class="fa fa-wrench fa-fw voda-text"></i> Resolve Errors<span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level collapse" style="height: 0px;">
                                 <li>
-                                    <a href="blank.html">Blank Page</a>
+                                    <a href="/errors/single"><i class="fa fa-gear fa-1x voda-text"></i>&nbsp;&nbsp;Resolve Single Errors</a>
                                 </li>
                                 <li>
-                                    <a href="login.html">Login Page</a>
+                                    <a href="/errors/report"><i class="fa fa-history fa-1x voda-text"></i>&nbsp;&nbsp; History</a>
                                 </li>
                             </ul>
                             <!-- /.nav-second-level -->
@@ -149,7 +135,7 @@
         <div id="page-wrapper" style="min-height: 836px;">
             <div class="row">
                 <div class="col-lg-12 page-header" style="margin-top: 20px;">
-                    <a href="#">Home  > &nbsp;&nbsp;&nbsp;</a><a href="#">Add User  > &nbsp;&nbsp;&nbsp;</a>
+                  {!! Breadcrumbs::render() !!}
                 </div>
                 <hr>
                 <div>
@@ -157,11 +143,6 @@
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
-            <!-- /.row -->
-            
-            <!-- /.row -->
-            
-            <!-- /.row -->
         </div>
         <!-- /#page-wrapper -->
 
