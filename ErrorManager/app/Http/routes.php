@@ -47,8 +47,8 @@ Route::get('/users/activate/{user_id}', 'UserController@activate');
 //deactivate user
 Route::get('/users/deactivate/{user_id}', 'UserController@deactivate');
 
-//Edit user view
-Route::get('/users/edit/{user_id}', 'UserController@edit');
+//Edit user view.
+Route::get('/users/edit/{user_id}', ['as' => 'Update user', 'uses' => 'UserController@edit']);
 
 //Update user
 Route::post('/users/update/{user_id}', 'UserController@updateuser');

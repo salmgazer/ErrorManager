@@ -21,12 +21,12 @@
         <div class="col-md-12">
         @include('common.success')
         @include('common.failure')
-        
+
         @if($users != null)
-            <div class="panel panel-default">
+            <div class="panel panel-warning">
                 <div class="panel-heading">Manage Users</div>
                 <div class="panel-body">
-                    
+
                     <div class="table-responsive">
                                 <table class="table table-striped table-bordered table-hover" id="users-Table">
                                     <thead>

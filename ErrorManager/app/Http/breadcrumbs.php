@@ -1,5 +1,5 @@
 <?php
-
+use App\User;
 //Home
 Breadcrumbs::register('home', function($breadcrumbs){
   $breadcrumbs->push('Home', route('home'));
@@ -55,5 +55,12 @@ Breadcrumbs::register('users', function($breadcrumbs){
 Breadcrumbs::register('Add user', function($breadcrumbs){
   $breadcrumbs->parent('users');
   $breadcrumbs->push('Add user', route('Add user'));
+});
+
+//edit existing user
+Breadcrumbs::register('Update user', function($breadcrumbs, $user_id){
+  $user = User::findOrFail($user_id);
+  $breadcrumbs->parent('users');
+  $breadcrumbs->push('Update '.$user->name, route('Update user', $user->id));
 });
  ?>

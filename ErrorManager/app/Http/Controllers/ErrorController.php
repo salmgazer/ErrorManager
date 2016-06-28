@@ -23,21 +23,39 @@ class ErrorController extends Controller
 
     /**** end instance variables ****/
 
+
     /********************  Redirects *****************/
-    //main page for admin -- bulk upload for resubmit issues
+
+    /**
+    *
+    * errors_retry()
+    *
+    * Takes admin to bulk errors page, mainly bulk Resubmit page
+    */
     public function errors_retry(){
+      /* check if user has logged in */
         if(Auth::check()){
+          /* check if user is active */
+          if(Auth::user()->status == 'inactive'){
+            return view('auth.login')
+              ->with('failure', 'You are not an active user. Contact administrator to activate your account!');
+              exit();
+          }
+            /* check if user is an admin */
             if(Auth::user()->type == 'admin'){
+              /* get all Bulk Errors file uploaded by current user */
                 $bulkfiles = Auth::user()
                     ->bulkfiles()
                     ->where('operation', 'Resubmit')
                     ->orderBy('created_at', 'desc')
                     ->get();
+                /* return errors page with bulk Resubmit bulk errors files by user */
                 return view('pages.admin.errors')
                     ->with('page_title', 'Bulk errors | Vodafone Zeus')
                     ->with('bulkfiles', $bulkfiles)
                     ->with('datatables', 'false');
             }else{
+              /* redirect to homepage because user has not right to access */
                 return redirect('/')
                     ->with('failure', 'You do not have access!');
             }
@@ -274,52 +292,62 @@ class ErrorController extends Controller
 
 	//upload bulk file first into folder
     public function bulkupload(Request $request){
-    	if(Auth::check() && Auth::user()->type == 'admin'){
-            $this->validate($request, [
-                'operation' => 'required'
-                ]);
-    		$file = $request->file('errors_file');
-    		$file_extension = $file->getClientOriginalExtension();
-    		if($file->isValid()){
-    			if($file_extension == 'csv' || $file_extension == 'xlsx'){
-    				$datetime = Carbon::now();
-		    		$filename =  $file->getClientOriginalName();
-		    		//move file to directory
-		    		$file->move(base_path() . '/public/files/error_files/new/', $filename);
-		    		//new bul file instance
-		    		$bulkfile = new BulkFile();
-		    		$bulkfile->filename = $filename;
-		    		$bulkfile->user_id = Auth::user()->id;
-		    		$bulkfile->operation = $request->operation;
-                    if($request->by_id){
-                        $bulkfile->by_id = $request->by_id;
-                    }
-                    if($request->action){
-                        $bulkfile->action = $request->action;
-                    }
-		    		$bulkfile->save();
-		    	return redirect()
-		    		->back()
-		    		->with('success', 'Ready to resolve errors');
-	    		}else {
-	    			return redirect()
-	    				->back()
-	    				->with('failure', 'Upload only .csv or .xlsx files');
-	    		}
-    		}else{
-    			return redirect()
-    				->back()
-    				->with('failure', 'File is corrupted, try again!');
-    		}
-    	}else{
-    		return redirect('/')
-    			->withError('Access', 'You do not have access');
-    	}
+      if(Auth::check()){
+      	if(Auth::user()->type == 'admin'){
+              $this->validate($request, [
+                  'operation' => 'required'
+                  ]);
+      		$file = $request->file('errors_file');
+      		$file_extension = $file->getClientOriginalExtension();
+      		if($file->isValid()){
+      			if($file_extension == 'csv' || $file_extension == 'xlsx'){
+      				$datetime = Carbon::now();
+  		    		$filename =  $file->getClientOriginalName();
+  		    		//move file to directory
+  		    		$file->move(base_path() . '/public/files/error_files/new/', $filename);
+  		    		//new bul file instance
+  		    		$bulkfile = new BulkFile();
+  		    		$bulkfile->filename = $filename;
+  		    		$bulkfile->user_id = Auth::user()->id;
+  		    		$bulkfile->operation = $request->operation;
+                      if($request->by_id){
+                          $bulkfile->by_id = $request->by_id;
+                      }
+                      if($request->action){
+                          $bulkfile->action = $request->action;
+                      }
+  		    		$bulkfile->save();
+  		    	return redirect()
+  		    		->back()
+  		    		->with('success', 'Ready to resolve errors');
+  	    		}else {
+  	    			return redirect()
+  	    				->back()
+  	    				->with('failure', 'Upload only .csv or .xlsx files');
+  	    		}
+      		}else{
+      			return redirect()
+      				->back()
+      				->with('failure', 'File is corrupted, try again!');
+      		}
+      	}else{
+      		return redirect('/')
+      			->withError('Access', 'You do not have access');
+      	}
+      }else{
+        return redirect()
+          ->with('failure', 'You need to login!');
+      }
     }
 
     //move to single errors page
     public function single(){
       if(Auth::check()){
+        if(Auth::user()->status == 'inactive'){
+          return view('auth.login')
+            ->with('failure', 'Your account is inactive. Contact Administrator to activate your account.');
+            exit();
+        }
       	if(Auth::user()->type == 'admin' || Auth::user()->type == 'front_office' || Auth::user()->type == 'back_office'){
       		$errors = Auth::user()->errors()->orderBy('created_at', 'desc')->get();
       			return view('pages.front_office.single')
@@ -372,24 +400,29 @@ class ErrorController extends Controller
 
     //upload single error -- admin
     public function singleupload(Request $request){
-    	if(Auth::user()->type == 'admin' || Auth::user()->type == 'front_office' || Auth::user()->type == 'back_office'){
-    		$this->validate($request, [
-    			'oc_id' => 'required|unique:errors',
-    			'operation' => 'required'
-    			]);
+      if(Auth::check()){
+      	if(Auth::user()->type == 'admin' || Auth::user()->type == 'front_office' || Auth::user()->type == 'back_office'){
+      		$this->validate($request, [
+      			'oc_id' => 'required|unique:errors',
+      			'operation' => 'required'
+      			]);
 
-    		$error = new Error();
-    		$error->operation = $request->operation;
-    		$error->oc_id = $request->oc_id;
-    		$error->user_id = Auth::user()->id;
-    		$error->save();
-    		return redirect()
-    			->back()
-    			->with('error', $error);
-    	}else{
-    		return redirect('/')
-    			->withError('Access', 'You do not have access');
-    	}
+      		$error = new Error();
+      		$error->operation = $request->operation;
+      		$error->oc_id = $request->oc_id;
+      		$error->user_id = Auth::user()->id;
+      		$error->save();
+      		return redirect()
+      			->back()
+      			->with('error', $error);
+      	}else{
+      		return redirect('/')
+      			->withError('Access', 'You do not have access');
+      	}
+      }else {
+        return redirect()
+          ->with('failure', 'You need to login!');
+      }
     }
 
     //upload single error -- front office

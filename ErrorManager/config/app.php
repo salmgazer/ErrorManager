@@ -157,8 +157,8 @@ return [
         App\Providers\RouteServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         DaveJamesMiller\Breadcrumbs\ServiceProvider::class,
-        Dsdevbe\LdapConnector\LdapConnectorServiceProvider::class,
         Yajra\Oci8\Oci8ServiceProvider::class,
+        Nathanmac\Utilities\Parser\ParserServiceProvider::class
 
     ],
 
@@ -208,6 +208,7 @@ return [
         'XmlParser' => Orchestra\Parser\Xml\Facade::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Breadcrumbs' => DaveJamesMiller\Breadcrumbs\Facade::class,
+        'Parser' => Nathanmac\Utilities\Parser\Facades\Parser::class
 
     ],
 
