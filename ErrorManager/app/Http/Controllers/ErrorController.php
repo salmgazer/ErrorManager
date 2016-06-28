@@ -31,6 +31,7 @@ class ErrorController extends Controller
     * errors_retry()
     *
     * Takes admin to bulk errors page, mainly bulk Resubmit page
+    * return view
     */
     public function errors_retry(){
       /* check if user has logged in */
@@ -60,36 +61,49 @@ class ErrorController extends Controller
                     ->with('failure', 'You do not have access!');
             }
         }else{
+          /* redirect to login page becuase user has been logged out */
             return redirect('/')
                 ->with('failure', 'You need to log in!');
         }
     }
 
-    //navigate to in_progress_by_name page
+    /**
+    *
+    * in_progress_name()
+    *
+    * loads bulk errors with in progress scenario that require oc_name
+    * return view
+    */
     public function in_progress_name(){
+      /* check if user has logged in*/
         if(Auth::check()){
+          /* check if user is an admin */
             if(Auth::user()->type == 'admin'){
+              /* get all bulk errors file with in progress scenario that include oc_name, uploaded by user */
                 $bulkfiles = Auth::user()
                     ->bulkfiles()
                     ->where('operation', 'In progress')
                     ->where('by_id', 'no')
                     ->orderBy('created_at', 'desc')
                     ->get();
+                /* return view for bulk in progress, case of oc_name */
                 return view('pages.admin.in_progress_name')
                     ->with('page_title', 'Bulk In Progress errors | Vodafone Zeus')
                     ->with('bulkfiles', $bulkfiles)
                     ->with('datatables', 'false');
                  }else{
+                   /* redirect to homepage if user has no right to access */
                 return redirect('/')
                     ->with('failure', 'You do not have access!');
             }
         }else{
+          /* redirect to login page id user has been logged out */
             return redirect('/')
                 ->with('failure', 'You need to log in!');
         }
     }
 
-    //navigate to bulk_in_progress_id page
+    
     public function in_progress_id(){
         if(Auth::check()){
             if(Auth::user()->type == 'admin'){
