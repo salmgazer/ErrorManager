@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use App\BulkFile;
 use App\Error;
 use Excel;
+use App\User;
 
 class ErrorController extends Controller
 {
@@ -54,7 +55,8 @@ class ErrorController extends Controller
                 return view('pages.admin.errors')
                     ->with('page_title', 'Bulk errors | Vodafone Zeus')
                     ->with('bulkfiles', $bulkfiles)
-                    ->with('datatables', 'false');
+                    ->with('datatables', 'false')
+                    ->with('flot', 'false');
             }else{
               /* redirect to homepage because user has not right to access */
                 return redirect('/')
@@ -90,7 +92,8 @@ class ErrorController extends Controller
                 return view('pages.admin.in_progress_name')
                     ->with('page_title', 'Bulk In Progress errors | Vodafone Zeus')
                     ->with('bulkfiles', $bulkfiles)
-                    ->with('datatables', 'false');
+                    ->with('datatables', 'false')
+                    ->with('flot', 'false');
                  }else{
                    /* redirect to homepage if user has no right to access */
                 return redirect('/')
@@ -103,7 +106,7 @@ class ErrorController extends Controller
         }
     }
 
-    
+
     public function in_progress_id(){
         if(Auth::check()){
             if(Auth::user()->type == 'admin'){
@@ -116,7 +119,8 @@ class ErrorController extends Controller
                 return view('pages.admin.in_progress_id')
                     ->with('page_title', 'Bulk In Progress errors | Vodafone Zeus')
                     ->with('bulkfiles', $bulkfiles)
-                    ->with('datatables', 'false');
+                    ->with('datatables', 'false')
+                    ->with('flot', 'false');
                  }else{
                 return redirect('/')
                     ->with('failure', 'You do not have access!');
@@ -367,7 +371,8 @@ class ErrorController extends Controller
       			return view('pages.front_office.single')
       				->with('oc_errors', $errors)
       				->with('page_title', 'Single Error | Vodafone Zeus')
-      				->with('datatables', 'false');
+      				->with('datatables', 'false')
+              ->with('flot', 'false');
       	}else{
       		return redirect('/')
       			->withError('failure', 'You do not have access');
@@ -382,9 +387,29 @@ class ErrorController extends Controller
     public function single_errors_history(){
       if(Auth::check()){
         if(Auth::user()->type == 'admin' || Auth::user()->type == 'front_office' || Auth::user()->type == 'back_office'){
+          //bar chart
+          $errors = (User::findOrFail(Auth::user()->id));
+          $errors_success = count(Error::where('user_id', Auth::user()->id)->where('status', 'success')->get());
+          $errors_failure = count(Error::where('user_id', Auth::user()->id)->where('status', 'failed')->get());
+
+          //pie Chart
+          $null = count(Error::where('user_id', Auth::user()->id)->where('scenario', null)->get());
+          $billing =  count(Error::where('user_id', Auth::user()->id)->where('scenario', 'Billing.CBS.ActivateSubscriber')->get());
+          $smtp = count(Error::where('user_id', Auth::user()->id)->where('scenario', 'Communications.SMTP.SendEmail')->get());
+          $timeout = count(Error::where('user_id', Auth::user()->id)->where('scenario', 'Time out')->get());
+          $vb = count(Error::where('user_id', Auth::user()->id)->where('scenario', '|')->get());
+
           return view('pages.front_office.report')
             ->with('page_title', 'Report - Single Errors | Vodafone Zeus')
-            ->with('datatables', 'false');
+            ->with('datatables', 'false')
+            ->with('errors_success', $errors_success)
+            ->with('errors_failure', $errors_failure)
+            ->with('null', $null)
+            ->with('billing', $billing)
+            ->with('smtp', $smtp)
+            ->with('timeout', $timeout)
+            ->with('vb', $vb)
+            ->with('flot', 'true');
         }else{
           return redirect('/')
             ->withError('failure', 'You do not have access');
@@ -401,7 +426,8 @@ class ErrorController extends Controller
         if(Auth::user()->type == 'admin'){
           return view('pages.admin.history')
             ->with('page_title', 'History - Bulk Errors | Vodafone Zeus')
-            ->with('datatables', 'false');
+            ->with('datatables', 'false')
+            ->with('flot', 'false');
         }else{
           return redirect('/')
             ->with('failure', 'You do not have access!');

@@ -37,7 +37,8 @@ class UserController extends Controller
       	if(Auth::user()->type == 'superadmin'){
       		return view('pages.admin.adduser')
       			->with('page_title', 'Add New User | Vodafone Zeus')
-            ->with('datatables', 'false');
+            ->with('datatables', 'false')
+            ->with('flot', 'false');
       	}else{
           /* redirect user if user is not superadmin */
       		return redirect()
@@ -238,7 +239,8 @@ class UserController extends Controller
       		return view('pages.admin.home')
       			->with('users', $users)
       			->with('page_title', 'Manage Users | Vodafone Zeus')
-                  ->with('datatables', 'true');
+            ->with('datatables', 'true')
+            ->with('flot', 'false');
       	}else{
       		/* redirect user to homepage because user has no access */
       		return redirect('/')
@@ -369,7 +371,8 @@ class UserController extends Controller
       		return view('pages.admin.edituser')
       			->with('user', $user)
       			->with('page_title', 'Edit user | Vodafone Zeus')
-            ->with('datatables', 'false');
+            ->with('datatables', 'false')
+            ->with('flot', 'false');
       	}else{
           /* redirect to homepage because user has no right to access */
       		return redirect('/')
@@ -403,7 +406,8 @@ class UserController extends Controller
             /* returnstatistics view */
               return view('pages.admin.statistics')
                 ->with('page_title', 'Error Statistics | Vodafone Zeus')
-                ->with('datatables', 'false');
+                ->with('datatables', 'false')
+                ->with('flot', 'false');
           }
           else{
             /* redirect to homepage becuase user has no right to access */
@@ -436,7 +440,8 @@ class UserController extends Controller
           /* return user profle page */
             return view('pages.admin.profile')
                 ->with('page_title', 'Profile | Vodafone Zeus')
-                ->with('datatables', 'false');
+                ->with('datatables', 'false')
+                ->with('flot', 'false');
         }
         else{
           /* redirect user to login page becuse user has been logged out */

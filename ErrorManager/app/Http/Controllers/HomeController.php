@@ -32,13 +32,15 @@ class HomeController extends Controller
         if(Auth::user()->type == 'front_office'){
           return redirect('/errors/single')
             ->with('page_title', 'Vodafone')
-            ->with('datatables', 'false');
+            ->with('datatables', 'false')
+            ->with('flot', 'false');
         }
         //check is user is in back office
         elseif(Auth::user()->type == 'back_office'){
           return redirect('/errors/single')
             ->with('page_title', 'Vodafone')
-            ->with('datatables', 'false');
+            ->with('datatables', 'false')
+            ->with('flot', 'false');
         }
         //check if user is an admin
         elseif(Auth::user()->type == 'admin'){
