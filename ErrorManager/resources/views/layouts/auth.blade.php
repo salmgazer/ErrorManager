@@ -46,7 +46,7 @@
                     <img src="/images/vodafone-logo.png" class="voda_logo">
                 </a>
                 <a class="navbar-brand" style="color: white;">
-                    Vodafone <b class="zeus">Zeus</b>
+                    Vodafone <b class="zeus">Zeus <i class="fa fa-bolt fa-1x"></i></b>
                 </a>
             </div>
 

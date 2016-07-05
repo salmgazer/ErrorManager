@@ -7,3 +7,5 @@ connect bulk_file to errors
 
 //
 Add action type to errors when resolving
+
+Find a way of telling a user the file they uploaded is wrong

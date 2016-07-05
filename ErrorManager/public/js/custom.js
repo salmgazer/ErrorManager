@@ -17,13 +17,15 @@ function resolve_error($error_id){
 	var objResult = sendRequest(base_url+'resolve_error/'+$error_id);
 	var feedback = document.getElementById('single_action'+$error_id);
 	var status = document.getElementById('single_success'+$error_id);
+	alert(objResult.xml);
+	/*
 	if(objResult.result == 1){
 		status.innerHTML = 'success';
 		feedback.innerHTML = '<i class="fa fa-check fa-2x text-success"></i>';
 	}else if (objResult.result == 0) {
 		status.innerHTML = 'failed';
 		feedback.innerHTML = '<i class="fa fa-times fa-2x voda-text"></i>'
-	}
+	}*/
 }
 
 //solve bulk errors
@@ -45,6 +47,7 @@ function bulk_resolve(bulk_id){
 	if (objResult.result === 0) {
 		alert(objResult.message);
 		gear.remove();
+		system_available = true;
 		return;
 	}
 	//iterate through list of orders from excel sheet

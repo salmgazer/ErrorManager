@@ -12,6 +12,8 @@
                 <div class="col-md-4">
                     <select name="key_type" class="form-control search-input">
                         <option>Name</option>
+                        <option>Group</option>
+                        <option>Status</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-default"><i class="fa fa-search fa-2x"></i></button>
@@ -40,6 +42,7 @@
                                     </thead>
                                     <tbody>
                                     @foreach($users as $user)
+                                      @if($user != Auth::user())
                                         <tr class="odd gradeX">
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->email }}</td>
@@ -53,6 +56,7 @@
                                             @endif
                                             </td>
                                         </tr>
+                                      @endif
                               		@endforeach
                                     </tbody>
                                 </table>

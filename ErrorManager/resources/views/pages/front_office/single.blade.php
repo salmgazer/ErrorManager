@@ -9,8 +9,8 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Resolve Single Errors</div>
                 <div class="panel-body">
-                    <div class="form-border col-md-12 col-md-offset-1" id="search-form">
-                    @if(Auth::user()->type == 'admin' || Auth::user()->type == 'front_office' || Auth::user()->type == 'back_office')
+                    <div class="form-border col-md-12" id="search-form">
+                    @if(Auth::user()->type == 'admin' || Auth::user()->type == 'back_office')
                     <b style="margin-bottom: 10px;">Resolve by operation:</b>
                     <form class="form-group" method="POST" action="/errors/singleupload" enctype="multipart/form-data" style="margin-bottom: 40px;">
                         {!! csrf_field() !!}
@@ -18,6 +18,9 @@
                             <input type="text" name="oc_id" class="form-control search-input" placeholder="OC ID"><!--<i class="fa fa-file-excel-o"></i>-->
                         </div>
                         <div class="col-md-4">
+                            <input type="text" name="oc_name" class="form-control search-input" placeholder="OC Name"><!--<i class="fa fa-file-excel-o"></i>-->
+                        </div>
+                        <div class="col-md-3">
                             <select name="operation" class="form-control search-input">
                                 <option> Resubmit </option>
                                 <option> Force Complete</option>
@@ -70,7 +73,13 @@
                                 @foreach($oc_errors as $error)
                                 <tr>
                                   <td>{{ $error->oc_id }}</td>
-                                  <td>{{ $error->scenario }}</td>
+                                  <td>
+                                    @if($error->scenario == null)
+                                     Null
+                                    @else
+                                    {{ $error->scenario }}
+                                    @endif
+                                  </td>
                                   <td>{{ $error->operation }}</td>
                                   <td id="single_success{{ $error->id }}">{{ $error->status }}</td>
                                   <td id="single_action{{ $error->id }}">

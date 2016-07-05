@@ -12,22 +12,25 @@
                     <div class="col-md-8 col-md-offset-2 danger">
 
                         <div class="fa-hover">
-                            <a href="#" class="profile_item"><i class="fa fa-user fa-1x voda-text"></i>&nbsp;&nbsp;&nbsp;&nbsp;{{ Auth::user()->name }}</a>
-                        </div><br>
+                            <p href="#" class="profile_item text-primary"><i class="fa fa-user fa-1x voda-text"></i>&nbsp;&nbsp;&nbsp;&nbsp;{{ Auth::user()->name }}</p>
+                        </div>
                         <div class="fa-hover">
-                            <a href="#" class="profile_item"><i class="fa fa-envelope fa-1x voda-text"></i>&nbsp;&nbsp;&nbsp;&nbsp;{{ Auth::user()->email }}</a>
-                        </div><br>
+                            <p href="#" class="profile_item text-primary"><i class="fa fa-envelope fa-1x voda-text"></i>&nbsp;&nbsp;&nbsp;&nbsp;{{ Auth::user()->email }}</p>
+                        </div>
                         <div class="fa-hover">
-                            <a href="#" class="profile_item"><i class="fa fa-group fa-1x voda-text"></i>&nbsp;&nbsp;&nbsp;&nbsp;
-                              @if(Auth::user()->type == 'admin')
+                            <p class="profile_item text-primary"><i class="fa fa-group fa-1x voda-text"></i>&nbsp;&nbsp;&nbsp;&nbsp;
+                              <?php $cur_user = Auth::user()->type; ?>
+                              @if($cur_user == 'admin')
                                 Admin
-                              @elseif(Auth::user()->type == 'front_office')
+                              @elseif($cur_user == 'front_office')
                                 Front Office
-                              @elseif(Auth::user()->type == 'back_office')
+                              @elseif($cur_user == 'back_office')
                                 Back Office
+                              @elseif($cur_user == 'superadmin')
+                                Superadmin
                               @endif
-                            </a>
-                        </div><br>
+                            </p>
+                        </div>
                         <hr>
 
                         <form class="form-horizontal" role="form" method="POST" action="/profile/updatepass">

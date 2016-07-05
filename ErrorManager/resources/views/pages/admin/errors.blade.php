@@ -1,5 +1,8 @@
 @extends('.layouts.app')
 @section('content')
+<?php
+$base_dir = '/';
+ ?>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -7,9 +10,9 @@
         @include('common.failure')
             <div class="panel panel-default">
                 <div class="panel-heading"><strong class="text-primary">Resolve Bulk <b class="voda-text">Resubmit</b> Errors</strong></div>
-                <div class="panel-body">   
+                <div class="panel-body">
                     <div class="form-border col-md-12 col-md-offset-1" id="search-form">
-                    <form class="form-group" method="POST" action="/errors/bulkupload/" enctype="multipart/form-data">
+                    <form class="form-group" method="POST" action="{{ $base_dir }}errors/bulkupload/" enctype="multipart/form-data">
                         {!! csrf_field() !!}
                         <div class="col-md-3">
                             <input type="file" name="errors_file" class="form-control search-input" class="required" required="required"><!--<i class="fa fa-file-excel-o"></i>-->
@@ -47,7 +50,7 @@
             </div>
 
             <!-- /.panel-heading -->
-        
+
             <div class="panel-body">
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered table-hover">
@@ -88,12 +91,12 @@
                 <!-- /.table-responsive -->
             </div>
             <!-- /.panel-body -->
-  
+
             <!-- Processing area -->
             <div class="panel panel-warning" style="margin-top: 50px;">
                 <div class="panel-heading">Details ~ Bulk file ID: <strong class="text-danger" id="processing_bulk_id" style="font-size: 25px;"></strong></div>
-                <div class="panel-body" id="bulk_result_area">   
-                    
+                <div class="panel-body" id="bulk_result_area">
+
                     <div class="table">
                         <table class="table table-striped table-bordered table-hover">
                             <thead>
@@ -105,7 +108,7 @@
                                 </tr>
                             </thead>
                             <tbody id="bulk_errors_tb">
-                                
+
                             </tbody>
                         </table>
                     </div>

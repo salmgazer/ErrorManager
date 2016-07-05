@@ -12,17 +12,132 @@ use App\BulkFile;
 use App\Error;
 use Excel;
 use App\User;
+use Parser;
 
 class ErrorController extends Controller
 {
     /***** instance variables *******/
+
+    protected $base_dir = '/';
+
+    /**
+    * $bulk_file hosts an instance of a bulk errors fle being resolved
+    */
     protected $bulk_file;
 
+    /**
+    * $success_count holds count of successful attempts when resolving bulk errors
+    */
     protected $success_count = 0;
 
+    /**
+    * $count holds count of errors that do not already exist in db
+    */
     protected $count = 0;
 
     /**** end instance variables ****/
+
+
+    /**************** SOAP XML Requests **************/
+
+    /**
+    *
+    * retry_failed_orders_xml($username, $integration_id, $order_id, $reason)
+    *
+    * creates the xml format for each error that required a resubmit
+    *
+    * @param $username username of the one sending Requests
+    * @param $integration_id is the integration_id
+    * @param $order_id is the id of the error to be resolved (oc_id)
+    * @param $reason is the scenario of the error
+    * @return String (xml ouput)
+    */
+    public function retry_failed_orders_xml($username=null, $order_id, $reason){
+      $final_xml = '
+          <?xml version="1.0" encoding="UTF-8"?>
+          <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope" xmlns:com="http://com.telco.to2f.support.services/">
+            <soapenv:Header>
+              <com:HeaderRequest>
+                <UserName>'.$username.'</UserName>
+              <com:HeaderRequest>
+            </soapenv:Header>
+            <soapenv:Body>
+              <com:RetryFailedOrders>
+                <OrderIDs>'.$order_id.'</OrderIDs>
+                <Reason>FC_'.$reason.'</Reason>
+              </com:RetryFailedOrders>
+            </soapenv:Body>
+          </soapenv:Envelope>';
+      return $final_xml;
+    }
+
+    /**
+    *
+    * resolve_oc_in_progress_name_xml($username, $integration_id, $order_id, $action, $reason)
+    *
+    * creates xml format for each error with the In Progress scenario using the oc_name and oc_id
+    *
+    * @param $username is username of person sending request
+    * @param $integration_id is integration is
+    * @param $order_id is the id of error to be resolved (oc_id)
+    * @param $action is the action to be performed on OC (RETRY, FC, FAILED)
+    * @param $function_name is the scenario of the error (oc_name)
+    * @return String (xml output)
+    */
+    public function resolve_oc_in_progress_name_xml($username=null, $order_id, $action, $function_name){
+      $final_xml = '
+          <?xml version="1.0" encoding="UTF-8"?>
+          <soapenv:Envelope xmlsn:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:com="http://com.telco.to2f.support.services/">
+            <soapenv:Header>
+              <com:HeaderRequest>
+                <UserName>'.$username.'</UserName>
+              </com:HeaderRequest>
+            </soapenv:Header>
+            <soapenv:Body>
+              <com:ResolveOCInProgressByName>
+                <OrderIDs>'.$order_id.'</OrderIDs>
+                <Action>
+                  <ActionType>'.$action.'</ActionType>
+                </Action>
+                <FunctionName>'.$functon_name.'</FunctionName>
+              </com:ResolveOCInProgressByName>
+            </soapenv:Body>
+          </soapenv:Envelope>';
+      return $final_xml;
+    }
+
+    /**
+    *
+    * resolve_oc_in_progress_id_xml($username, $order_id, $action)
+    *
+    * creates xml format for each of the In Progress errors that need to be resolved
+    * @param $username is the name of the user sending the Requests
+    * @param $order_id is the id of the error to be resolved (oc_id)
+    * @param $action is the action to be performed on the oc (RETRY, FC, FAILED)
+    * @return String (xml ouput)
+    */
+    public function resolve_oc_in_progress_id_xml($username=null, $order_id, $action){
+      $final_xml = '
+          <?xml version="1.0" encoding="UTF-8"?>
+          <soapenv:Envelope xmlsn:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:com="http://com.telco.to2f.support.services/">
+            <soapenv:Header>
+              <com:HeaderRequest>
+                <UserName>'.$username.'</UserName>
+              </com:HeaderRequest>
+            </soapenv:Header>
+            <soapenv:Body>
+              <com:ResolveOCInProgressByOCID>
+                <OrderIDs>'.$order_id.'</OrderIDs>
+                <Action>
+                  <ActionType>'.$action.'</ActionType>
+                </Action>
+              </com:ResolveOCInProgressByOCID>
+            </soapenv:Body>
+          </soapenv:Envelope>';
+      return $final_xml;
+    }
+
+    /**************** End SOAP XML Requests **********/
 
 
     /********************  Redirects *****************/
@@ -32,7 +147,8 @@ class ErrorController extends Controller
     * errors_retry()
     *
     * Takes admin to bulk errors page, mainly bulk Resubmit page
-    * return view
+    *
+    * @return view
     */
     public function errors_retry(){
       /* check if user has logged in */
@@ -59,12 +175,12 @@ class ErrorController extends Controller
                     ->with('flot', 'false');
             }else{
               /* redirect to homepage because user has not right to access */
-                return redirect('/')
+                return redirect($this->base_dir)
                     ->with('failure', 'You do not have access!');
             }
         }else{
           /* redirect to login page becuase user has been logged out */
-            return redirect('/')
+            return redirect($this->base_dir.'login')
                 ->with('failure', 'You need to log in!');
         }
     }
@@ -74,7 +190,8 @@ class ErrorController extends Controller
     * in_progress_name()
     *
     * loads bulk errors with in progress scenario that require oc_name
-    * return view
+    *
+    * @return view
     */
     public function in_progress_name(){
       /* check if user has logged in*/
@@ -96,17 +213,24 @@ class ErrorController extends Controller
                     ->with('flot', 'false');
                  }else{
                    /* redirect to homepage if user has no right to access */
-                return redirect('/')
+                return redirect($this->base_dir)
                     ->with('failure', 'You do not have access!');
             }
         }else{
           /* redirect to login page id user has been logged out */
-            return redirect('/')
+            return redirect($this->base_dir.'login')
                 ->with('failure', 'You need to log in!');
         }
     }
 
-
+    /**
+    *
+    * in_progress_id()
+    *
+    * loads bulk errors with in progress scenario that require oc_id only
+    *
+    * @return view
+    */
     public function in_progress_id(){
         if(Auth::check()){
             if(Auth::user()->type == 'admin'){
@@ -122,27 +246,44 @@ class ErrorController extends Controller
                     ->with('datatables', 'false')
                     ->with('flot', 'false');
                  }else{
-                return redirect('/')
+                return redirect($this->base_dir)
                     ->with('failure', 'You do not have access!');
             }
         }else{
-            return redirect('/')
+            return redirect($this->base_dir.'login')
                 ->with('failure', 'You need to log in!');
         }
     }
     /***************** end Redirects *****************/
 
-    //decides what request xml request to send
+    /**
+    *
+    * master_resolve($error, $by_id, $action)
+    *
+    * Decides what request xml request to send
+    *
+    *
+    */
     public function master_resolve($error, $by_id='no', $action=null){
-        //the case of Retry Failed Orders
-        if($operation == 'Resubmit'){
-            if($error->scenario == null){
-                return $this->resolve_failed_orders($error->oc_id, 'Null');
-            }else{
-                return $this->resolve_failed_orders($error->oc_id, 'FC_'.$error->scenario);
+        /* the case of Retry Failed Orders */
+        if($error->operation == 'Resubmit'){                                                           //if operation type is Resubmit
+            if($error->scenario == null){                                                       //when scenario of error is null
+                return $this->resolve_failed_orders($error->oc_id, 'Null');                     //call resolve_failed_orders
+            }else{                                                                              //when scenario is not null
+                switch ($error->scenario) {
+                  case 'Time out':
+                    return $this->resolve_failed_orders($error->oc_id, 'Null');                 //call resolve_failed_orders and parse Null
+                    break;
+                  case '|':
+                    return $this->resolve_failed_orders($error->oc_id, 'Null');                 //call resolve_failed_orders and parse Null
+                    break;
+                  default:
+                    return $this->resolve_failed_orders($error->oc_id, 'FC_'.$error->scenario); //call resolve_failed_orders and parse scenario
+                    break;
+                }
             }
         }
-        //the case of Resolve OC In Progress (by OC name) -- acton i given
+        /* the case of Resolve OC In Progress (by OC name) -- acton i given */
         elseif($operation == 'In progress'){
             if($by_id =='no'){
                 //in progres with oc_name
@@ -155,41 +296,103 @@ class ErrorController extends Controller
     }
 
 
-    /*** Single Error Actions ***/
+    /**
+    *
+    * resolve_error($error_id)
+    *
+    * This function resolves single errors by deciding which resolution function to call
+    *
+    * @param $error-id is the id of the error that needs to be resolved
+    * @return JSON
+    */
     public function resolve_error($error_id){
-      $error = Error::findOrFail($error_id);
-    //  $result = $this->master_resolve($error);
-      //simulate
-      $result = 'failure';
-      if(($error->id % 2) == 0){
+      $error = Error::findOrFail($error_id);    //get error from db
+      $result = $this->master_resolve($error);  //call master_resolve to try to resolve
+      /*
+      //simulation
+      $result = 'failed';
+      if($error->id % 2 == 0){
         $result = 'success';
-      }
-      $error->tried = 'yes';
-      if($result == 'success'){
-        $error->status = 'success';
-        $error->save();
-        echo '{"result": 1}';
+      }*/
+      $error->tried = 'yes';                    //set that system has tried to resolve
+      if($result == 'success'){                 // if error is resolved
+        $error->status = 'success';             //set status of error to success
+        $error->save();                         // save state of error to db
+        echo '{"result": 1}';                   //return result of action in json format [1 = success, 0 = failure]
         return;
-      }else{
-        $error->status = 'failed';
-        $error->save();
-        echo '{"result": 0}';
+      }else{                                    //if error failed to be resolved
+        $error->status = 'failed';              //set status of error to failed
+        $error->save();                         //save state of error to db
+        echo '{"result": 0}';                   //return result of action in json format [1 = success, 0 = failure]
         return;
       }
     }
 
+    /**
+    *
+    * resolve_oc_in_progress_name($oc_id, $action, $scenario)
+    *
+    * This function resolves a single in_progress error using the oc_id and oc_name
+    *
+    * @param $oc_id is the order component id
+    * @param $action is the kind of action that needs to be taken to resolve the Error
+    * @param $scenario is the kind of scenario that needs to be resolved.
+    * @return String
+    */
     public function resolve_oc_in_progress_name($oc_id, $action, $scenario){
-        //xml request
+      $url = 'http://10.255.35.34.7001/to2f-support/TO2FSupportService';
+      $request = new HTTPRequest($url, HTTP_METH_POST);
+      $request->setRawData($this->retry_failed_orders_xml(Auth::user()->email, $oc_id, $action, $scenario));
+      $request->send();
+      $response = $request->getResponseBody();
+      if($response == 'Success'){
+        return 'Success';
+      }else{
+        return 'failed';
+      }
     }
 
-    //Function for resolving an oc in progress :: RETRY, FAILED,
+    /**
+    *
+    * resolve_oc_in_progress_id($oc_id, $action)
+    *
+    * This function resolves in progress issues with oc_id only and the action required
+    * @param $oc_id is the id of an oc
+    * @param $action is the action taken to resolve issue
+    * @return String
+    */
     public function resolve_oc_in_progress_id($oc_id, $action){
-        //xml request
+      $url = 'http://10.255.35.34.7001/to2f-support/TO2FSupportService';
+      $request = new HTTPRequest($url, HTTP_METH_POST);
+      $request->setRawData($this->resolve_oc_in_progress_id_xml(Auth::user()->email, $oc_id, $action));
+      $request->send();
+      $response = $request->getResponseBody();
+      if($response == 'Success'){
+        return 'Success';
+      }else{
+        return 'failed';
+      }
     }
 
-    //Function for resubmitting
-    public function resolve_failed_orders($oc_id, $action_scenario){
-        //xml request
+    /**
+    *
+    * resolve_failed_orders($oc_id, $action_scenario)
+    *
+    * @param $oc_id is the id of the OC that needs to be resolve_failed_orders
+    * @param $action_scenario is the scenario of the issue to be resolved
+    * @return String
+    */
+    public function resolve_failed_orders($oc_id, $scenario){
+      $url = 'http://10.255.35.34:7001/to2f-support/TO2FSupportService';
+      $request = new HTTPRequest($url, HTTP_METH_POST);
+      $request->setRawData($this->retry_failed_orders_xml(Auth::user()->email, $oc_id, $scenario));
+      $request->send();
+      $response = $request->getResponseBody();
+      if($response == 'Success'){
+        return 'Success';
+      }else{
+        return 'failed';
+      }
     }
 
     /****************** Single Error Actions ****************/
@@ -197,7 +400,14 @@ class ErrorController extends Controller
 
     /****************** Bulk Error Actions *******************/
 
-    /*get oc_ids that are not already being worked on */
+    /**
+    *
+    * get_all_new_ocs($rows)
+    *
+    * get oc_ids that are not already being worked on
+    * @param $rows An array of ocs within submitted file that are not already processed
+    * @return array
+    */
     public function get_all_new_ocs($rows){
         $ocs = array();
         foreach ($rows as $row) {
@@ -208,7 +418,14 @@ class ErrorController extends Controller
         return $ocs;
     }
 
-    //main bulk resolve function
+    /**
+    *
+    * bulk_resolve($bulk_id)
+    *
+    * main bulk resolve function
+    * @param $bulk_id is the id of the bulk_file being processed
+    * @return view
+    */
     public function bulk_resolve($bulk_id){
         if(Auth::check()){
             if(Auth::user()->type == 'admin'){
@@ -258,16 +475,24 @@ class ErrorController extends Controller
 
                 });
             }else{
-                return redirect()                                //if user has not right to access function
+                return redirect($this->base_dir)                                //if user has not right to access function
                     ->with('failure', 'You do not have access!');
             }
         }else{
-            return redirect('/')                                 //if user has not logged in
+            return redirect($this->base_dir.'login')                                 //if user has not logged in
                 ->with('failure', 'You need to first login');
         }
     }
 
-    //save bulk errors into db and try to resolve
+    /**
+    *
+    * process_bulk_errors($rows)
+    *
+    * saves bulk errors into db and tries to resolve them
+    *
+    * @param $rows is list of errors to resolve (from a common bulk errors file)
+    * @return JSON
+    */
     private function process_bulk_errors($rows){
         $last_row = $rows[sizeof($rows) - 1];       //get the last_row in oc_id column
         foreach($rows as $row){
@@ -286,9 +511,11 @@ class ErrorController extends Controller
 
             //send xml http_request(method, url)
             //$xml_result = $this->master_resolve();
-
+            $xml_result = 'failed';
+            if(($error_id % 2) == 0)
+              $xml_result = 'success';
             $error->tried = 'yes';
-            if($this->count % 2 == 0){
+            if($xml_result == 'success'){
                 $error->status = 'success';
             }
             else{
@@ -308,7 +535,15 @@ class ErrorController extends Controller
 
 /*************  Redirection and other functions **************/
 
-	//upload bulk file first into folder
+	/**
+  *
+  * bulkupload(Request)
+  *
+  * upload bulk file into folder
+  *
+  * @param $request is a POST request from form
+  * @return view
+  */
     public function bulkupload(Request $request){
       if(Auth::check()){
       	if(Auth::user()->type == 'admin'){
@@ -349,16 +584,23 @@ class ErrorController extends Controller
       				->with('failure', 'File is corrupted, try again!');
       		}
       	}else{
-      		return redirect('/')
+      		return redirect($this->base_dir)
       			->withError('Access', 'You do not have access');
       	}
       }else{
-        return redirect()
+        return redirect($this->base_dir.'login')
           ->with('failure', 'You need to login!');
       }
     }
 
-    //move to single errors page
+    /**
+    *
+    * single()
+    *
+    * redirects to single errors page
+    *
+    * @return view
+    */
     public function single(){
       if(Auth::check()){
         if(Auth::user()->status == 'inactive'){
@@ -374,23 +616,34 @@ class ErrorController extends Controller
       				->with('datatables', 'false')
               ->with('flot', 'false');
       	}else{
-      		return redirect('/')
+      		return redirect($this->base_dir)
       			->withError('failure', 'You do not have access');
       	}
       }else{
-        return redirect('/')
+        return redirect($this->base_dir.'login')
           ->with('failure', 'You need to login!');
       }
     }
 
-    //move to single errors History page
+    /**
+    *
+    * single_errors_history()
+    *
+    * moves to signle errors history page
+    * @return view
+    */
     public function single_errors_history(){
       if(Auth::check()){
+        if(Auth::user()->status == 'inactive'){
+          return view('auth.login')
+            ->with('failure', 'Your account is inactive. Contact Administrator to activate your account.');
+            exit();
+        }
         if(Auth::user()->type == 'admin' || Auth::user()->type == 'front_office' || Auth::user()->type == 'back_office'){
           //bar chart
           $errors = (User::findOrFail(Auth::user()->id));
-          $errors_success = count(Error::where('user_id', Auth::user()->id)->where('status', 'success')->get());
-          $errors_failure = count(Error::where('user_id', Auth::user()->id)->where('status', 'failed')->get());
+          $errors_success = count(Error::where('user_id', Auth::user()->id)->where('status', 'success')->whereRaw('Date(created_at) = CURDATE()')->get());
+          $errors_failure = count(Error::where('user_id', Auth::user()->id)->where('status', 'failed')->whereRaw('Date(created_at) = CURDATE()')->get());
 
           //pie Chart
           $null = count(Error::where('user_id', Auth::user()->id)->where('scenario', null)->get());
@@ -411,63 +664,104 @@ class ErrorController extends Controller
             ->with('vb', $vb)
             ->with('flot', 'true');
         }else{
-          return redirect('/')
+          return redirect($this->base_dir)
             ->withError('failure', 'You do not have access');
         }
       }else{
-        return redirect('/')
+        return redirect($this->base_dir.'login')
           ->withError('failure', 'You need to login!');
       }
     }
 
-    //move to bulk history page
+    /**
+    *
+    * bulk_history()
+    *
+    * move to bulk history page
+    *
+    * @return view
+    */
     public function bulk_history(){
       if(Auth::check()){
+        if(Auth::user()->status == 'inactive'){
+          return view('auth.login')
+            ->with('failure', 'Your account is inactive. Contact Administrator to activate your account.');
+            exit();
+        }
         if(Auth::user()->type == 'admin'){
           return view('pages.admin.history')
             ->with('page_title', 'History - Bulk Errors | Vodafone Zeus')
             ->with('datatables', 'false')
             ->with('flot', 'false');
         }else{
-          return redirect('/')
+          return redirect($this->base_dir)
             ->with('failure', 'You do not have access!');
         }
       }else{
-        return redirect('/')
+        return redirect($this->base_dir.'login')
           ->with('failure', 'You need to login!');
       }
     }
 
-    //upload single error -- admin
+    /**
+    *
+    * singleupload(Request)
+    *
+    * upload single error to db (back office and admin only)
+    *
+    * @return view
+    */
     public function singleupload(Request $request){
       if(Auth::check()){
+        if(Auth::user()->status == 'inactive'){
+          return view('auth.login')
+            ->with('failure', 'Your account is inactive. Contact Administrator to activate your account.');
+            exit();
+        }
       	if(Auth::user()->type == 'admin' || Auth::user()->type == 'front_office' || Auth::user()->type == 'back_office'){
       		$this->validate($request, [
       			'oc_id' => 'required|unique:errors',
-      			'operation' => 'required'
+      			'operation' => 'required',
       			]);
 
       		$error = new Error();
       		$error->operation = $request->operation;
       		$error->oc_id = $request->oc_id;
+          if($request->oc_name){
+            $error->scenario = $request->oc_name;
+          }else{
+            $error->scenario = null;
+          }
       		$error->user_id = Auth::user()->id;
       		$error->save();
       		return redirect()
       			->back()
       			->with('error', $error);
       	}else{
-      		return redirect('/')
+      		return redirect($this->base_dir)
       			->withError('Access', 'You do not have access');
       	}
       }else {
-        return redirect()
+        return redirect($this->base_dir.'login')
           ->with('failure', 'You need to login!');
       }
     }
 
-    //upload single error -- front office
+    /**
+    *
+    * singleuploadf(Request)
+    *
+    * upload single error to db (front office, admin, back office)
+    *
+    * @return view
+    */
     public function singleuploadf(Request $request){
       if(Auth::check()){
+        if(Auth::user()->status == 'inactive'){
+          return view('auth.login')
+            ->with('failure', 'Your account is inactive. Contact Administrator to activate your account.');
+            exit();
+        }
         if(Auth::user()->type = 'admin' || Auth::user()->type == 'front_office' || Auth::user()->type == 'back_office'){
             //validate
             $this->validate($request, [
@@ -476,6 +770,7 @@ class ErrorController extends Controller
                 ]);
             $error = new Error();
             $error->scenario = $request->scenario;
+            $error->operation = $this->getoperation($error->scenario);
             $error->oc_id = $request->oc_id;
             $error->by_scenario = 'yes';
             $error->user_id = Auth::user()->id;
@@ -484,16 +779,48 @@ class ErrorController extends Controller
                 ->back()
                 ->with('error', $error);
         }else{
-            return redirect('/')
+            return redirect($this->base_dir)
                 ->withError('Access', 'You do not have access');
         }
       }else{
-        return redirect('/')
+        return redirect($this->base_dir.'login')
             ->with('Access', 'You need to login!');
       }
     }
 
-    //view details of errors with a comman bulk_id
+    /**
+    *
+    * getoperation($scenario)
+    *
+    * Finds the right operation for a scenario
+    *
+    * @param $scenario is the oc_name or scenario of Error
+    * @return String returns an operation for the scenario
+    */
+    public function getoperation($scenario){
+      $operation = null;
+      switch ($scenario) {
+        case '|':
+          $operation = 'Resubmit';
+          break;
+        case 'Time out':
+          $operation = 'Resubmit';
+          break;
+        default:
+          $operation = 'unknown';
+          break;
+      }
+      return $operation;
+    }
+
+    /**
+    *
+    * bulk_details($bulk_id)
+    *
+    * view details of errors from a common bulk file
+    *
+    * @return view
+    */
     public function bulk_details($bulk_id){
         if(Auth::check()){
             if(Auth::user()->type == 'admin'){
@@ -509,15 +836,16 @@ class ErrorController extends Controller
                 echo "]}";
                 return;
             }else{
-                return redirect('/')
+                return redirect($this->base_dir)
                     ->withError('Access', 'You do not have access');
             }
         }else{
-            return redirect('/')
+            return redirect($this->base_dir.'login')
                 ->withError('failure', 'You need to login');
         }
 
     }
 
 /************ End  Redirection and other functions   *********/
+
 }

@@ -82,7 +82,12 @@
           }, {
               label: "&nbsp;&nbsp;|",
               data: {{ $vb }}
-          }];
+          },
+          {
+              label: "Time out",
+              data: {{ $timeout }}
+          }
+        ];
 
           var plotObj = $.plot($("#flot-pie-chart"), data, {
               series: {

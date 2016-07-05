@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 28, 2016 at 02:27 PM
+-- Generation Time: Jul 05, 2016 at 09:56 PM
 -- Server version: 10.1.13-MariaDB
 -- PHP Version: 7.0.6
 
@@ -44,7 +44,9 @@ CREATE TABLE `bulk_files` (
 --
 
 INSERT INTO `bulk_files` (`id`, `filename`, `user_id`, `status`, `created_at`, `updated_at`, `operation`, `success_rate`, `action`, `by_id`) VALUES
-(44, 'FC_file.csv', 3, 'processed', '2016-06-27 10:43:45', '2016-06-27 10:46:20', 'Resubmit', 0.47368421052632, NULL, 'no');
+(52, 'FC_file.csv', 3, 'new', '2016-07-05 23:17:39', '2016-07-05 23:17:39', 'Resubmit', 0, NULL, 'no'),
+(53, 'In Progress.csv', 3, 'new', '2016-07-05 23:18:42', '2016-07-05 23:18:42', 'In progress', 0, 'FC', 'no'),
+(54, 'In Progress - ID.csv', 3, 'new', '2016-07-05 23:19:11', '2016-07-05 23:19:11', 'In progress', 0, 'FAILED', 'yes');
 
 -- --------------------------------------------------------
 
@@ -61,7 +63,7 @@ CREATE TABLE `errors` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `bulk_id` int(10) UNSIGNED DEFAULT NULL,
-  `operation` enum('Resubmit','Force complete','Cancel') COLLATE utf8_unicode_ci NOT NULL,
+  `operation` enum('Resubmit','Force complete','Cancel') COLLATE utf8_unicode_ci DEFAULT NULL,
   `scenario` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `by_scenario` enum('yes','no') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'no',
   `action` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL
@@ -72,38 +74,15 @@ CREATE TABLE `errors` (
 --
 
 INSERT INTO `errors` (`id`, `oc_id`, `tried`, `status`, `user_id`, `created_at`, `updated_at`, `bulk_id`, `operation`, `scenario`, `by_scenario`, `action`) VALUES
-(1031, '33632', 'yes', 'failed', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Billing.CBS.ActivateSubscriber', 'yes', NULL),
-(1032, '98800', 'yes', 'success', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', NULL, 'yes', NULL),
-(1033, '645444', 'yes', 'failed', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', NULL, 'yes', NULL),
-(1034, '357998', 'yes', 'success', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Billing.CBS.ActivateSubscriber', 'yes', NULL),
-(1035, '433477', 'yes', 'failed', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Communications.SMTP.SendEmail', 'yes', NULL),
-(1036, '333444', 'yes', 'success', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Communications.SMTP.SendEmail', 'yes', NULL),
-(1037, '56745', 'yes', 'failed', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Communications.SMTP.SendEmail', 'yes', NULL),
-(1038, '336887', 'yes', 'success', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Billing.CBS.ActivateSubscriber', 'yes', NULL),
-(1039, '4345865', 'yes', 'failed', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Billing.CBS.ActivateSubscriber', 'yes', NULL),
-(1040, '3347777', 'yes', 'success', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Billing.CBS.ActivateSubscriber', 'yes', NULL),
-(1041, '4445666', 'yes', 'failed', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Billing.CBS.ActivateSubscriber', 'yes', NULL),
-(1042, '893300', 'yes', 'success', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Billing.CBS.ActivateSubscriber', 'yes', NULL),
-(1043, '5666000', 'yes', 'failed', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Communications.SMTP.SendEmail', 'yes', NULL),
-(1044, '3545799', 'yes', 'success', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Communications.SMTP.SendEmail', 'yes', NULL),
-(1045, '346', 'yes', 'failed', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Communications.SMTP.SendEmail', 'yes', NULL),
-(1046, '345', 'yes', 'success', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Communications.SMTP.SendEmail', 'yes', NULL),
-(1047, '3589', 'yes', 'failed', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Billing.CBS.ActivateSubscriber', 'yes', NULL),
-(1048, '3333', 'yes', 'success', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Billing.CBS.ActivateSubscriber', 'yes', NULL),
-(1049, '990000', 'yes', 'failed', 3, '2016-06-27 10:46:20', '2016-06-27 10:46:20', 44, 'Resubmit', 'Billing.CBS.ActivateSubscriber', 'yes', NULL),
-(1050, '34545', 'yes', 'success', 3, '2016-06-27 10:50:18', '2016-06-27 11:18:28', NULL, 'Resubmit', NULL, 'no', NULL),
-(1051, '3334223', 'yes', 'failed', 3, '2016-06-27 11:06:45', '2016-06-27 11:19:49', NULL, 'Force complete', NULL, 'no', NULL),
-(1052, '233909', 'yes', 'success', 3, '2016-06-27 11:07:01', '2016-06-27 11:20:28', NULL, 'Cancel', NULL, 'no', NULL),
-(1053, '323232', 'yes', 'failed', 9, '2016-06-27 12:42:50', '2016-06-27 12:49:07', NULL, 'Resubmit', NULL, 'no', NULL),
-(1054, '9900990', 'yes', 'success', 9, '2016-06-27 12:48:30', '2016-06-27 12:49:19', NULL, 'Cancel', NULL, 'no', NULL),
-(1055, '8181813', 'yes', 'failed', 9, '2016-06-27 12:48:40', '2016-06-27 12:49:10', NULL, 'Resubmit', 'Time out', 'yes', NULL),
-(1056, '7777888', 'yes', 'success', 9, '2016-06-27 12:56:59', '2016-06-27 13:05:15', NULL, 'Resubmit', '|', 'yes', NULL),
-(1057, '7897689', 'yes', 'failed', 9, '2016-06-27 12:57:20', '2016-06-27 13:05:18', NULL, 'Force complete', NULL, 'no', NULL),
-(1058, '6554411', 'yes', 'success', 3, '2016-06-27 13:51:45', '2016-06-27 14:09:07', NULL, 'Cancel', NULL, 'no', NULL),
-(1059, '443311', 'yes', 'failed', 3, '2016-06-27 13:51:55', '2016-06-27 14:09:09', NULL, 'Resubmit', 'Time out', 'yes', NULL),
-(1060, '7787800', 'yes', 'success', 3, '2016-06-27 14:30:38', '2016-06-27 14:30:43', NULL, 'Resubmit', 'Time out', 'yes', NULL),
-(1061, '411111', 'yes', 'failed', 3, '2016-06-28 10:37:30', '2016-06-28 10:37:34', NULL, 'Force complete', NULL, 'no', NULL),
-(1062, '45545411', 'yes', 'success', 3, '2016-06-28 10:37:43', '2016-06-28 10:37:46', NULL, 'Resubmit', '|', 'yes', NULL);
+(5, '64212', 'yes', 'failed', 3, '2016-07-05 23:57:27', '2016-07-06 00:52:51', NULL, 'Cancel', 'Billing.CBS.ActivateSubscriber', 'no', NULL),
+(7, '787898', 'yes', 'failed', 3, '2016-07-06 00:09:15', '2016-07-06 00:52:49', NULL, 'Resubmit', 'Time out', 'yes', NULL),
+(8, '90875', 'yes', 'success', 3, '2016-07-06 00:09:23', '2016-07-06 00:52:48', NULL, 'Resubmit', '|', 'yes', NULL),
+(9, '656778', 'yes', 'failed', 3, '2016-07-06 00:10:03', '2016-07-06 00:52:46', NULL, 'Force complete', 'Billing.CBS.ActivateSubscriber', 'no', NULL),
+(10, '58989', 'yes', 'failed', 3, '2016-07-06 00:15:37', '2016-07-06 02:11:00', NULL, 'Resubmit', 'Time out', 'yes', NULL),
+(11, '900099', 'yes', 'failed', 3, '2016-07-06 00:19:37', '2016-07-06 00:52:43', NULL, 'Cancel', NULL, 'no', NULL),
+(12, '889900', 'yes', 'success', 3, '2016-07-06 00:30:10', '2016-07-06 00:52:41', NULL, 'Resubmit', 'Time out', 'yes', NULL),
+(13, '566322', 'no', NULL, 3, '2016-07-06 00:57:02', '2016-07-06 00:57:02', NULL, 'Force complete', NULL, 'no', NULL),
+(14, '565679', 'no', NULL, 3, '2016-07-06 01:15:11', '2016-07-06 01:15:11', NULL, 'Resubmit', NULL, 'no', NULL);
 
 -- --------------------------------------------------------
 
@@ -124,7 +103,9 @@ INSERT INTO `migrations` (`migration`, `batch`) VALUES
 ('2014_10_12_000000_create_users_table', 1),
 ('2014_10_12_100000_create_password_resets_table', 1),
 ('2016_06_20_172749_create_errors_table', 2),
-('2016_06_20_191431_create_bulk_files_table', 3);
+('2016_06_20_191431_create_bulk_files_table', 3),
+('2016_07_02_152802_create_apps_table', 4),
+('2016_07_02_152834_create_has_apps_table', 4);
 
 -- --------------------------------------------------------
 
@@ -163,16 +144,18 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `password`, `remember_token`, `created_at`, `updated_at`, `type`, `role`, `phone`, `status`) VALUES
-(1, 'salifu mutaru', 'salifu.mutaru@vodafone.com', '$2y$10$NL39lrVn4MipQWxHIltaGu8gDzz2FpvzJ608fjnIP9shN9vLlgV.O', 'Z2E8kFMKnb8EekeYheRUxJ4U94DvnK33f7zSWpCoHHU4VxWevsayGt7FHm73', '2016-06-17 04:08:36', '2016-06-28 10:35:14', 'superadmin', '', '', 'active'),
-(2, 'Dominic Boachie', 'dominic.boachie@vodafone.com', '$2y$10$AgSJf1Z60QQo6cWrEEi2aeu5kQ9jfsaQvZnfZoYEKfpmIyJjuanJK', 'zguRVNIEgq35DFG2kiIpzsUhVucYHCuDlQE056UMnDkVP0VARu6x6kaP28M4', '2016-06-17 04:29:07', '2016-06-18 04:55:49', 'admin', '', '', 'inactive'),
-(3, 'Ama Bainson', 'ama.bainson@vodafone.com', '$2y$10$LtgD19/19Sl9/uglWpZA7utzHogqrqFOrsY7mcaQh/mU3SgzOLwF.', 'JtbDOLOiZeZeQipw9ajAAJT5kfZEOywGyS6GG4pnfXVYdMeeBq9f6gBLcEzO', '2016-06-17 04:30:27', '2016-06-28 10:36:01', 'admin', 'CRM Core Support', '', 'active'),
-(4, 'Alexandra Nsiah', 'alex.nsiah@vodafone.com', '$2y$10$RfdPyuiKr3.VrwxuYDxaIuiu1eBkuJs2qE/5L/56JQiqnOxWYW97a', 'QbMIz5xfiSwPKdVZwFfEfhVueVtGXVDF5swVhxLgy1aOMSS7hPnkBJXcGKYz', '2016-06-17 04:31:33', '2016-06-18 04:55:41', 'back_office', '', '', 'inactive'),
-(5, 'Adwoa Arhin', 'adwoa.arhin@vodafone.com', '$2y$10$7fJwlLxlBY/MhPntZUio0ePmXYezG8fPWNQT80MUz2wT.BnFyNqPa', 'kqT4869vf125umbIOQ5Y6Ri9sO61G3XjXbtkO5wEzUNm4zVsBXcNYI3mhAEG', '2016-06-17 04:32:36', '2016-06-18 04:55:39', 'front_office', '', '', 'inactive'),
+(1, 'salifu mutaru', 'salifu.mutaru@vodafone.com', '$2y$10$ChiwYQ2WSHVM310meYcDiuJyw/S8ATWS6SS4rsAL7qajSxNtvzoVO', 'aRwWhaOJzPBncoyaynVhovuVqHfyLLcA64Qze7LK2GMe14F8ZhJJOMNqvH80', '2016-06-17 04:08:36', '2016-07-06 00:40:18', 'superadmin', '', '', 'active'),
+(2, 'Dominic Boachie', 'dominic.boachie@vodafone.com', '$2y$10$AgSJf1Z60QQo6cWrEEi2aeu5kQ9jfsaQvZnfZoYEKfpmIyJjuanJK', 'zguRVNIEgq35DFG2kiIpzsUhVucYHCuDlQE056UMnDkVP0VARu6x6kaP28M4', '2016-06-17 04:29:07', '2016-07-05 22:38:51', 'admin', '', '', 'active'),
+(3, 'Ama Bainson', 'ama.bainson@vodafone.com', '$2y$10$bIZAMA0xMvObB2YJDhG7Z.J4Tw3Ri3ZIdtlRH8VMrp6mFELqnJwYu', 'ErgbhM0dgvN0e6XWlo3Iawgs2EooDtzvONNPj6ykWzeFat7t3R8uXLBfL955', '2016-06-17 04:30:27', '2016-07-06 00:38:30', 'admin', 'CRM Core Support', '', 'active'),
+(4, 'Alexandra Nsiah', 'alex.nsiah@vodafone.com', '$2y$10$RfdPyuiKr3.VrwxuYDxaIuiu1eBkuJs2qE/5L/56JQiqnOxWYW97a', 'QbMIz5xfiSwPKdVZwFfEfhVueVtGXVDF5swVhxLgy1aOMSS7hPnkBJXcGKYz', '2016-06-17 04:31:33', '2016-07-05 22:38:21', 'back_office', '', '', 'active'),
+(5, 'Adwoa Arhin', 'adwoa.arhin@vodafone.com', '$2y$10$7fJwlLxlBY/MhPntZUio0ePmXYezG8fPWNQT80MUz2wT.BnFyNqPa', 'kqT4869vf125umbIOQ5Y6Ri9sO61G3XjXbtkO5wEzUNm4zVsBXcNYI3mhAEG', '2016-06-17 04:32:36', '2016-07-05 22:15:24', 'admin', 'CRM Core Support', '', 'inactive'),
 (6, 'Mariam Salis', 'mariam.salis@vodafone.com', '$2y$10$0ZOjyVzKLQm5Y2cgz/2KLOGc2jEbFaiERCTdEmW3JBY66fqUPeTv.', NULL, '2016-06-18 00:07:18', '2016-06-18 04:45:07', 'front_office', '', '', 'active'),
 (7, 'Roseline Mensah', 'roseline.mensah@vodafone.com', '$2y$10$DrtLILUCJBPwv6HvZTKXN.8nJrxOVWHmPV4WxJWBW6tOWQ2ebS8ei', NULL, '2016-06-18 02:07:29', '2016-06-28 10:32:30', 'admin', '', '', 'inactive'),
-(8, 'Ivy Appiah', 'ivy.appiah@vodafone.com', '$2y$10$5MPusAJAj4jBEUqDhNhsdepOU.cgNAEQcPhm7Ylh3aS2xAhEPB/2e', '8KH38V6Kc1f3NcdYTjw5rasd88H4gw5eGUuvPtHUozOzo1qzjkvUWscs94Td', '2016-06-18 04:29:44', '2016-06-28 08:16:01', 'front_office', '', '', 'inactive'),
-(9, 'Abunanga Bantu', 'abunanga.bantu@vodafone.com', '$2y$10$NaeBj0sTn8VeimajxChmHO927nYgzb.Mr9ywgoo3P39W.F0OGd6V2', 'NaXfIntyDwf4PVGjsesqTSndZhV380VppE7BrUUIGVwkEUryagoQ8TIxrZJN', '2016-06-18 04:40:25', '2016-06-28 10:50:01', 'back_office', 'Application Developer', '', 'active'),
-(10, 'Isaac Joel', 'issac.joel@vodafone.com', '$2y$10$rFry/T.xLPPNhyZRro4su.xruYnhH9m1mpIzsokeEgmZiHzvK3nkK', NULL, '2016-06-28 07:31:59', '2016-06-28 07:32:51', 'admin', 'IT Intern', '', 'active');
+(8, 'Ivy Appiah', 'ivy.appiah@vodafone.com', '$2y$10$.d6kgGuVEYScPFJFvzCoMeDwiLfyKibOmuKO.1LhmGAkKTOqj85i.', 'HPm27Fx1T77IO6XgJSG1WrskyQgLPduaXjwW6vzt8rsYLFtnkZ6eAcUryEAT', '2016-06-18 04:29:44', '2016-06-29 12:59:29', 'front_office', '', '', 'active'),
+(9, 'Abunanga Bantu', 'abunanga.bantu@vodafone.com', '$2y$10$NaeBj0sTn8VeimajxChmHO927nYgzb.Mr9ywgoo3P39W.F0OGd6V2', 'NaXfIntyDwf4PVGjsesqTSndZhV380VppE7BrUUIGVwkEUryagoQ8TIxrZJN', '2016-06-18 04:40:25', '2016-07-05 00:25:14', 'front_office', 'Application Developer', '', 'active'),
+(10, 'Isaac Joel', 'issac.joel@vodafone.com', '$2y$10$rFry/T.xLPPNhyZRro4su.xruYnhH9m1mpIzsokeEgmZiHzvK3nkK', NULL, '2016-06-28 07:31:59', '2016-07-05 22:38:30', 'admin', 'IT Intern', '', 'inactive'),
+(11, 'John Kennedy', 'john.kennedy@vodafone.com', '$2y$10$vG.pfVUErnAxtD/sLUi1G.ayDYHmIaEUIP7a0IjJHgSNy7.paNsQS', NULL, '2016-06-29 12:24:26', '2016-07-05 22:38:39', 'admin', 'CRM Core Support', '', 'inactive'),
+(12, 'Ali Njie', 'ali.njie@vodafone.com', '$2y$10$/6HR/BZtUa6oTedJ4wSgiefv6aKG16bPPoZaUiOOuRold54oPoRze', NULL, '2016-07-05 22:40:01', '2016-07-05 22:40:51', 'admin', 'ITHelpDesk', '', 'inactive');
 
 --
 -- Indexes for dumped tables
@@ -213,17 +196,17 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `bulk_files`
 --
 ALTER TABLE `bulk_files`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 --
 -- AUTO_INCREMENT for table `errors`
 --
 ALTER TABLE `errors`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1063;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

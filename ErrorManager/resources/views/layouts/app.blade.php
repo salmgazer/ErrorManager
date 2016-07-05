@@ -22,7 +22,7 @@
                     <img src="/images/vodafone-logo.png" id="small_logo">
                 </a>
                 <a class="navbar-brand" style="color: white;" href="/">
-                    Vodafone <b class="zeus">Zeus</b>
+                    Vodafone <b class="zeus">Zeus <i class="fa fa-bolt fa2x"></i></b>
                 </a>
 
                 <!--<button class="btn" onclick="getuser()">Click</button>-->

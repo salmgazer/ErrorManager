@@ -17,12 +17,15 @@ class UserController extends Controller
     	//record attempt to access to db
     }
 
+    protected $base_dir = '/';
+
     /**
     *
     * adduser()
     *
     * Takes admin to add user view
-    * Return view
+    *
+    * @return view
     */
     public function adduser(){
       /* Check if user has logged in */
@@ -46,7 +49,7 @@ class UserController extends Controller
       	}
       }else{
         /* redirect user to login page if user has not logged in */
-        return redirect('/')
+        return redirect($this->base_dir)
           ->with('failure', 'You need to login!');
       }
     }
@@ -57,7 +60,7 @@ class UserController extends Controller
     *
     * Adds a new user with specific role to the stream_copy_to_stream
     * @param $request is a POST Request
-    * return view - Add user view
+    * @return view - Add user view
     */
     public function addnewuser(Request $request){
       /* Check if user has logged in */
@@ -113,12 +116,12 @@ class UserController extends Controller
             	->with('success', 'You have successfully added '.$user->name);
             }else{
               /* redirect user to homepage because he has not right to access add new page */
-              return redirect('/')
+              return redirect($this->base_dir)
                 ->with('failure', 'You do not have access!');
             }
           }else{
             /* redirect user to log in because user is logged out */
-            return redirect('/')
+            return redirect($this->base_dir)
               ->with('failure', 'You need to login!');
           }
     }
@@ -129,7 +132,7 @@ class UserController extends Controller
     *
     * @param $user_id is a user's account id
     * @param $request is a POST Request
-    * return view
+    * @return view
     */
     public function updateuser($user_id, Request $request){
       /* Check if user has logged in */
@@ -180,12 +183,12 @@ class UserController extends Controller
               return redirect()->back()->with('success', $user->name.' has been updated.');
           }else{
             /* redirect back homepage because user has no access */
-              return redirect('/')
+              return redirect($this->base_dir)
                 ->with('failure', 'You do not have access');
           }
         }else{
           /* redirect to login page because user is logged out */
-          return redirect('/')
+          return redirect($this->base_dir)
             ->with('failure', 'You need to login!');
         }
     }
@@ -194,9 +197,10 @@ class UserController extends Controller
     /**
     * getusers(Request $request)
     *
-    * Returns all
+    * Returns all users with or without a search key
+    *
     * @param $request is a POST Request
-    * return view
+    * @return view
     */
     public function getusers(Request $request){
       /* check if user has logged in */
@@ -214,27 +218,26 @@ class UserController extends Controller
       		$key_type = $request->key_type;
       		$users = null;
       		if($key == null && $key_type != null){
-      			switch ($key_type) {
-      				case 'Name':
-      					$users = User::get();
-      					break;
-      				default:
-      					# code...
-      					break;
-      			}
+      			$users = User::limit(100)->get();
       		}
           /* if user searches with a key value */
       		elseif($key != null && $key_type != null){
       			switch ($key_type) {
       				case 'Name':
-      					$users = User::where('name','LIKE', '%'.$key.'%')->get();
+      					$users = User::where('name','LIKE', '%'.$key.'%')->limit(50)->get();
       					break;
+              case 'Group':
+                $users = User::where('type', $key)->limit(100)->get();
+                break;
+              case 'Status':
+                $users = User::where('status', $key)->limit(100)->get();
+                break;
       				default:
-      					# code...
+      					$users = User::limit(100)->get();
       					break;
       			}
       		}elseif($key == null && $key_type == null){
-      			$users = User::orderBy('status', 'desc')->get();
+      			$users = User::limit(100)->get();
       		}
       		return view('pages.admin.home')
       			->with('users', $users)
@@ -243,12 +246,12 @@ class UserController extends Controller
             ->with('flot', 'false');
       	}else{
       		/* redirect user to homepage because user has no access */
-      		return redirect('/')
+      		return redirect($this->base_dir)
             ->with('failure', 'You do not have access');
       	}
       }else{
         /* redirect to login page because user has logged out */
-        return redirect('/')
+        return redirect($this->base_dir)
           ->with('failure', 'You need to login!');
       }
     }
@@ -258,8 +261,9 @@ class UserController extends Controller
     * activate($user_id)
     *
     * Activates a user account
+    *
     * @param $user_id is a user's id
-    * return view
+    * @return view
     */
     public function activate($user_id){
       /* check if user has logged in */
@@ -280,23 +284,29 @@ class UserController extends Controller
       			$user->save();
             /* redirect back if user is already active with message */
       			if($user->status == 'active'){
-      				return redirect()->back()->with('success', $user->name.' is now active');
+      				return redirect()
+                  ->back()
+                  ->with('success', $user->name.' is now active');
       			}else{
               /* redirect back with error message if system failed to activate user */
-      				return redirect()->back()->with('failure', $user->name.' is still inactive. Encountered errors!');
+      				return redirect()
+                  ->back()
+                  ->with('failure', $user->name.' is still inactive. Encountered errors!');
       			}
       		}elseif($user->status == 'active'){
             /* redirect back with success message if user is successfully activated */
-      			return redirect()->back()->with('failure', $user->name.' is already active');
+      			return redirect()
+                ->back()
+                ->with('failure', $user->name.' is already active');
       		}
       	}else{
           /* redirect user to homepage because user has no right to access */
-      		return redirect('/')
+      		return redirect($this->base_dir)
             ->with('failure', 'You do not have access!');
       	}
       }else{
         /* redirect user to login page because user is logged out */
-        return redirect('/')
+        return redirect($this->base_dir)
           ->with('failure', 'You need to login!');
       }
     }
@@ -304,8 +314,11 @@ class UserController extends Controller
     /**
     *
     * deactivate($user_id)
+    *
+    * Deactivates an active user
+    *
     * @param $user_id is a user's id value
-    * return view
+    * @return view
     */
     public function deactivate($user_id){
       /* check if user has logged in */
@@ -327,23 +340,29 @@ class UserController extends Controller
       			$user->save();
       			if($user->status == 'inactive'){
               /* redirect back with success message */
-      				return redirect()->back()->with('success', $user->name.' is now inactive.');
+      				return redirect()
+                  ->back()
+                  ->with('success', $user->name.' is now inactive.');
       			}else{
               /* redirect with error message if system failed to deactivate user */
-      				return redirect()->back()->with('failure', $user->name.' is still active. Encountered errors!');
+      				return redirect()
+                  ->back()
+                  ->with('failure', $user->name.' is still active. Encountered errors!');
       			}
       		}elseif($user->status == 'inactive'){
             /* redirect with failre message when user is alread inactive */
-      			return redirect()->back()->with('failure', $user->name.' is already inactive!');
+      			return redirect()
+                ->back()
+                ->with('failure', $user->name.' is already inactive!');
       		}
       	}else{
           /* redirect user to homepage because user has no access */
-      		return redirect('/')
+      		return redirect($this->base_dir)
             ->with('failure', 'You do not have access!');
       	}
       }else{
         /* redirect user to login page because user is logged out */
-        return redirect('/')
+        return redirect($this->base_dir)
           ->with('failure', 'You need to login!');
       }
     }
@@ -352,7 +371,9 @@ class UserController extends Controller
     * edit($user_id)
     *
     * makes changes to a user's account details
+    *
     * @param $user_id is a user's id value
+    * @return view
     */
     public function edit($user_id){
       /* check if user has logged in */
@@ -375,12 +396,12 @@ class UserController extends Controller
             ->with('flot', 'false');
       	}else{
           /* redirect to homepage because user has no right to access */
-      		return redirect('/')
+      		return redirect($this->base_dir)
             ->with('failure', 'You do not have access!');
       	}
       }else{
         /* redirect to login page becuase user has been logged out */
-        return redirect('/')
+        return redirect($this->base_dir)
           ->with('failure', 'You need to login!');
       }
     }
@@ -390,7 +411,8 @@ class UserController extends Controller
     * statistics()
     *
     * shows statistics of errors
-    * return view
+    *
+    * @return view
     */
     public function statistics(){
       /* chck if user has logged in */
@@ -411,12 +433,12 @@ class UserController extends Controller
           }
           else{
             /* redirect to homepage becuase user has no right to access */
-              return redirect('/')
+              return redirect($this->base_dir)
                 ->with('failure', 'You do not have access');
           }
         }else{
           /* redirect to login page because user has been logged out */
-          return redirect('/')
+          return redirect($this->base_dir)
             ->with('failure', 'You need to login!');
         }
     }
@@ -426,7 +448,8 @@ class UserController extends Controller
     * profile()
     *
     * displays user's account details, with view to change password
-    * return view
+    *
+    * @return view
     */
     public function profile(){
       /* check if user has logged in */
@@ -445,18 +468,19 @@ class UserController extends Controller
         }
         else{
           /* redirect user to login page becuse user has been logged out */
-            return redirect('/')
+            return redirect($this->base_dir)
                 ->with('failure', 'You need to login!');
         }
     }
 
     /**
     *
-    * updatepass
+    * updatepass(Request)
     *
     * updates password of a user
+    *
     * @param $request is a POST Request
-    * return view
+    * @return view
     */
     public function updatepass(Request $request){
       /* check if user has logged in */
@@ -486,11 +510,11 @@ class UserController extends Controller
             /* commit changes made to User object to db */
             $user->save();
             /* logout user so user logs in with new password */
-            return redirect('/logout')
+            return redirect($this->base_dir.'logout')
                 ->with('success', 'Your password has been updated!');
         }else{
           /*redirect user if user has been logged out */
-            return redirect('/')
+            return redirect($this->base_dir)
                 ->with('failure', 'You need to login!');
         }
     }
